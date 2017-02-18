@@ -7,11 +7,10 @@ import spock.lang.Specification
 class MathProblemTest extends Specification {
 
     IGPProgram ind = Mock(IGPProgram)
-    MathProblem problem
-    MathProblem.FormulaFitnessFunction fitnessFunction = new MathProblem.FormulaFitnessFunction(50)
+    static MathProblem problem
+    static MathProblem.FormulaFitnessFunction fitnessFunction = new MathProblem.FormulaFitnessFunction(1)
 
-    def 'setup'()
-    {
+    def setupSpec() {
         GPConfiguration config = new GPConfiguration()
         config.setFitnessFunction(fitnessFunction)
         config.setPopulationSize(1)
@@ -21,14 +20,19 @@ class MathProblemTest extends Specification {
 
     def 'should ComputeRawFitness'() {
         given:
-        ind.execute_int(0, _) >> 1000
-        ind.execute_int(1, _) >> 1000
+        ind.execute_int(0, _) >> rmr
+        ind.execute_int(1, _) >> lmr
         problem.create()
 
         when:
         def fitness = fitnessFunction.evaluate(ind)
 
         then:
-        fitness > 0
+        fitness == expectedFitness
+        where:
+        rmr  | lmr  | expectedFitness
+        1000 | 1000 | 648
+        0    | 0    | 0
+        9000 | 9000 | 0
     }
 }
