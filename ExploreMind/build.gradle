@@ -1,9 +1,0 @@
-apply plugin: 'java'
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    compile group: 'com.github.bdeneuter', name: 'lejos-ev3-api', version: '0.9.1-beta'
-}

@@ -1,3 +1,0 @@
-Manifest-Version: 1.0
-Main-Class: com.paul.explore.Explore
-Class-Path: /home/root/lejos/lib/ev3classes.jar /home/root/lejos/libjna/usr/share/java/jna.jar
