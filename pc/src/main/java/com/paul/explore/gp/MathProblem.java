@@ -104,7 +104,7 @@ public class MathProblem extends GPProblem {
         config.setMaxInitDepth(4);
         config.setPopulationSize(populationSize);
         config.setMaxCrossoverDepth(8);
-        config.setFitnessFunction(new MathProblem.FormulaFitnessFunction());
+        config.setFitnessFunction(new MathProblem.FormulaFitnessFunction(50));
         config.setStrictProgramCreation(true);
         MathProblem problem = new MathProblem(config);
         // Create the genotype of the problem, i.e., define the GP commands and
@@ -129,6 +129,13 @@ public class MathProblem extends GPProblem {
      */
     public static class FormulaFitnessFunction extends GPFitnessFunction {
 
+        private int noOfSteps;
+
+        public FormulaFitnessFunction(int noOfSteps)
+        {
+            this.noOfSteps = noOfSteps;
+        }
+
         protected double evaluate(IGPProgram a_subject) {
             double fitness = 0;
             int tolerance = BOT_SIZE / 2;
@@ -141,9 +148,9 @@ public class MathProblem extends GPProblem {
 
             int[] distances = virtualBot.scan();
             boolean touchSensorIsTouchingObstacle = virtualBot.touchSensorIsTouchingObstacle();
-            // Evaluate function for 20 steps
+            // Evaluate function for noOfSteps steps
             // ---------------------- -------------------
-            for (int i = 0; i < 50; i++) {
+            for (int i = 0; i < noOfSteps; i++) {
                 // Provide the sensory input
                 // See method create(), declaration of "nodeSets" for where X is
                 // defined.

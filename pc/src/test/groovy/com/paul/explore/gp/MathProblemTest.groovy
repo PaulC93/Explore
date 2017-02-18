@@ -8,7 +8,7 @@ class MathProblemTest extends Specification {
 
     IGPProgram ind = Mock(IGPProgram)
     MathProblem problem
-    MathProblem.FormulaFitnessFunction fitnessFunction = new MathProblem.FormulaFitnessFunction()
+    MathProblem.FormulaFitnessFunction fitnessFunction = new MathProblem.FormulaFitnessFunction(50)
 
     def 'setup'()
     {
