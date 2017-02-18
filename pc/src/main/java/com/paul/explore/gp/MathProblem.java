@@ -8,7 +8,7 @@ import org.jgap.gp.GPFitnessFunction;
 import org.jgap.gp.GPProblem;
 import org.jgap.gp.IGPProgram;
 import org.jgap.gp.function.*;
-import org.jgap.gp.impl.DeltaGPFitnessEvaluator;
+import org.jgap.gp.impl.DefaultGPFitnessEvaluator;
 import org.jgap.gp.impl.GPConfiguration;
 import org.jgap.gp.impl.GPGenotype;
 import org.jgap.gp.terminal.Terminal;
@@ -18,22 +18,19 @@ import java.util.Arrays;
 
 import static com.paul.explore.sim.VirtualBot.BOT_SIZE;
 
-public class MathProblem extends GPProblem
-{
+public class MathProblem extends GPProblem {
 
     private static Variable[] d = new Variable[16];
     private static Variable t;
     private static int noOfInputs;
 
     public MathProblem(GPConfiguration a_conf)
-            throws InvalidConfigurationException
-    {
+            throws InvalidConfigurationException {
         super(a_conf);
     }
 
     @Override
-    public GPGenotype create() throws InvalidConfigurationException
-    {
+    public GPGenotype create() throws InvalidConfigurationException {
         return create(noOfInputs);
     }
 
@@ -49,8 +46,7 @@ public class MathProblem extends GPProblem
      * @throws InvalidConfigurationException
      */
     public GPGenotype create(int noOfInputs)
-            throws InvalidConfigurationException
-    {
+            throws InvalidConfigurationException {
         GPConfiguration conf = getGPConfiguration();
         // At first, we define the return type of the GP program.
         // ------------------------------------------------------
@@ -67,8 +63,7 @@ public class MathProblem extends GPProblem
         // We use 17 variables that can be set in the fitness function.
         // 16 for distances around
         // 1 for the touch sensor
-        for (int i = 0; i < 16; i++)
-        {
+        for (int i = 0; i < 16; i++) {
             d[i] = Variable.create(conf, "d[" + i + "]", CommandGene.IntegerClass);
         }
         t = Variable.create(conf, "t", CommandGene.BooleanClass);
@@ -81,14 +76,11 @@ public class MathProblem extends GPProblem
         And and = new And(conf);
         Terminal terminal = new Terminal(conf, CommandGene.IntegerClass, 0.0d, 55.0d, true);
         CommandGene[] commandGenes = {d[0], d[2], d[4], d[6], d[8], d[10], d[12], d[14], t, add, subtract, multiply, xor, or, and, terminal};
-        if (noOfInputs == 4)
-        {
+        if (noOfInputs == 4) {
             commandGenes = new CommandGene[]{d[2], d[6], d[10], d[14], t, add, subtract, multiply, xor, or, and, terminal};
-        } else if (noOfInputs == 8)
-        {
+        } else if (noOfInputs == 8) {
             commandGenes = new CommandGene[]{d[0], d[2], d[4], d[6], d[8], d[10], d[12], d[14], t, add, subtract, multiply, xor, or, and, terminal};
-        } else if (noOfInputs == 16)
-        {
+        } else if (noOfInputs == 16) {
             commandGenes = new CommandGene[]{d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7], d[8], d[9], d[10], d[11], d[12], d[13], d[14], d[15], t, add, subtract, multiply, xor, or, and, terminal};
         }
         CommandGene[][] nodeSets = {commandGenes, commandGenes};
@@ -102,14 +94,13 @@ public class MathProblem extends GPProblem
     }
 
     public static void run(int populationSize, int noOfGenerations, int noOfInputs)
-            throws Exception
-    {
+            throws Exception {
         MathProblem.noOfInputs = noOfInputs;
         // Setup the algorithm's parameters.
         // ---------------------------------
         GPConfiguration config = new GPConfiguration();
         // ----------------------------------------------------------------------
-        config.setGPFitnessEvaluator(new DeltaGPFitnessEvaluator());
+        config.setGPFitnessEvaluator(new DefaultGPFitnessEvaluator());
         config.setMaxInitDepth(4);
         config.setPopulationSize(populationSize);
         config.setMaxCrossoverDepth(8);
@@ -136,17 +127,10 @@ public class MathProblem extends GPProblem
      * between expected Y and actual Y is the fitness, the lower the better (as
      * it is a defect rate here).
      */
-    public static class FormulaFitnessFunction
-            extends GPFitnessFunction
-    {
-        protected double evaluate(final IGPProgram a_subject)
-        {
-            return computeRawFitness(a_subject);
-        }
+    public static class FormulaFitnessFunction extends GPFitnessFunction {
 
-        public double computeRawFitness(final IGPProgram ind)
-        {
-            double error = 23200;
+        protected double evaluate(IGPProgram a_subject) {
+            double fitness = 0;
             int tolerance = BOT_SIZE / 2;
 
             Object[] noargs = new Object[0];
@@ -159,52 +143,42 @@ public class MathProblem extends GPProblem
             boolean touchSensorIsTouchingObstacle = virtualBot.touchSensorIsTouchingObstacle();
             // Evaluate function for 20 steps
             // ---------------------- -------------------
-            for (int i = 0; i < 50; i++)
-            {
+            for (int i = 0; i < 50; i++) {
                 // Provide the sensory input
                 // See method create(), declaration of "nodeSets" for where X is
                 // defined.
                 // -------------------------------------------------------------
-                for (int j = 0; j < 16; j++)
-                {
+                for (int j = 0; j < 16; j++) {
                     d[j].set(distances[j]);
                 }
                 t.set(touchSensorIsTouchingObstacle);
-                try
-                {
+                try {
                     // Execute the GP program representing the function to be evolved.
                     // As in method create(), the return type is declared as float (see
                     // declaration of array "types").
                     // ----------------------------------------------------------------
-                    int rightMotorRotations = ind.execute_int(0, noargs);
-                    int leftMotorRotations = ind.execute_int(1, noargs);
+                    int rightMotorRotations = a_subject.execute_int(0, noargs);
+                    int leftMotorRotations = a_subject.execute_int(1, noargs);
                     virtualBot.move(rightMotorRotations, leftMotorRotations);
                     distances = virtualBot.scan();
                     touchSensorIsTouchingObstacle = virtualBot.touchSensorIsTouchingObstacle();
-                    if (virtualBot.isInTheSameSpotAsBefore(tolerance) || virtualBot.isTouchingObstacle())
-                    {
-                        return Integer.MAX_VALUE;
+                    if (virtualBot.isInTheSameSpotAsBefore(tolerance) || virtualBot.isTouchingObstacle()) {
+                        return 0;
                     }
 
-                    error -= virtualBot.getNoOfNewVisitedPoints();
+                    fitness += virtualBot.getNoOfNewVisitedPoints();
 
-                } catch (ArithmeticException ex)
-                {
+                } catch (ArithmeticException ex) {
                     // This should not happen, some illegal operation was executed.
                     // ------------------------------------------------------------
                     System.out.println("d = " + Arrays.toString(d));
                     System.out.println("t = " + touchSensorIsTouchingObstacle);
-                    System.out.println(ind);
+                    System.out.println(a_subject);
                     throw ex;
                 }
             }
-            // In case the error is small enough, consider it perfect.
-            // -------------------------------------------------------
-            if (error < 0.001)
-            {
-                error = 0.0d;
-            }
-            return error;
+            return fitness;
         }
+
     }
 }

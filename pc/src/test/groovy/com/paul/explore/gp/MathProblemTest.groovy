@@ -26,7 +26,7 @@ class MathProblemTest extends Specification {
         problem.create()
 
         when:
-        def fitness = fitnessFunction.computeRawFitness(ind)
+        def fitness = fitnessFunction.evaluate(ind)
 
         then:
         fitness > 0
