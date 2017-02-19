@@ -275,19 +275,9 @@ public class VirtualBot
         return leftMotorPosition;
     }
 
-    public void setLeftMotorPosition(Point2D p)
-    {
-        leftMotorPosition = p;
-    }
-
     public Point2D getRightMotorPosition()
     {
         return rightMotorPosition;
-    }
-
-    public void setRightMotorPosition(Point2D p)
-    {
-        rightMotorPosition = p;
     }
 
     public float getOrientation()
@@ -295,7 +285,7 @@ public class VirtualBot
         return orientation;
     }
 
-    public void setOrientation(float angle)
+    private void setOrientation(float angle)
     {
         orientation = normalizeAngle(angle);
     }
@@ -304,32 +294,6 @@ public class VirtualBot
     {
         Point2D sensorPosition = GeometryHelper.move(center, 11, orientation); //11cm from bot center till touch sensor
         return map.isObstacle(round(sensorPosition.getX()), round(sensorPosition.getY()));
-    }
-
-    public boolean isInTheSameSpotAsBefore(int tolerance)
-    {
-
-        if (previousCenter.equals(center))
-        {
-            return true;
-        }
-        int px = round(previousCenter.getX());
-        int py = round(previousCenter.getY());
-        int minX = px - tolerance;
-        int minY = px - tolerance;
-        int maxX = px + tolerance;
-        int maxY = py + tolerance;
-        for (int x = minX; x < maxX; x++)
-        {
-            for (int y = minY; y < maxY; y++)
-            {
-                if ((new Point(x, y)).equals(center))
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     public Map getMap()
@@ -365,11 +329,6 @@ public class VirtualBot
         return noOfNewVisitedPoints;
     }
 
-    public Rectangle getFootprint()
-    {
-        return footprint;
-    }
-
     public Point2D getSensorRotationPoint()
     {
         return sensorRotationPoint;
@@ -395,7 +354,7 @@ public class VirtualBot
         return touchingObstacle;
     }
 
-    public boolean updateIsTouchingObstacle()
+    private boolean updateIsTouchingObstacle()
     {
         touchingObstacle = false;
 

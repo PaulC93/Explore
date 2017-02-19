@@ -103,19 +103,4 @@ class VirtualBotTest extends Specification {
            337.5 | [16]
            360   | [17]*/
     }
-
-    def 'should check if is in the same spot'() {
-
-        given:
-        VirtualBot virtualBot = new VirtualBot(0, 0, 0, new VirtualMap())
-        virtualBot.move(rightMotorRotaion, leftMotorRotation)
-
-        expect:
-        virtualBot.isInTheSameSpotAsBefore(0) == expected
-
-        where:
-        rightMotorRotaion | leftMotorRotation | expected
-        0                 | 0                 | true
-        1000              | 1000              | false
-    }
 }

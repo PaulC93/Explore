@@ -7,14 +7,11 @@ import org.jgap.gp.GPFitnessFunction;
 import org.jgap.gp.IGPProgram;
 import org.jgap.gp.terminal.Variable;
 
-import static com.paul.explore.sim.VirtualBot.BOT_SIZE;
-
 public class RobotFitnessFunction extends GPFitnessFunction {
 
     private int noOfInputs;
     private int noOfSteps;
     private static final Object[] NO_ARGS = new Object[0];
-    private static final int TOLERANCE = BOT_SIZE / 2;
 
     public RobotFitnessFunction(int noOfInputs, int noOfSteps) {
         this.noOfInputs = noOfInputs;
@@ -41,7 +38,7 @@ public class RobotFitnessFunction extends GPFitnessFunction {
             virtualBot.move(rightMotorRotations, leftMotorRotations);
             distances = virtualBot.scan();
             touchSensorIsTouchingObstacle = virtualBot.touchSensorIsTouchingObstacle();
-            if (virtualBot.isInTheSameSpotAsBefore(TOLERANCE) || virtualBot.isTouchingObstacle()) {
+            if (virtualBot.isTouchingObstacle()) {
                 return 0;
             }
             fitness += virtualBot.getNoOfNewVisitedPoints();
