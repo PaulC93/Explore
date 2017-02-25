@@ -7,10 +7,10 @@ import static com.paul.explore.model.GeometryHelper.*;
 
 public class Map {
 
-    private static final int UNKNOWN = 0; //default
-    protected static final int FREE = 1;
-    private static final int VISITED = 2;
-    protected static final int OBSTACLE = 3;
+    private static final int UNKNOWN = 0;   //000 //default
+    private static final int FREE = 1;      //001
+    private static final int VISITED = 2;   //010
+    protected static final int OBSTACLE = 7;//111
     protected byte[][] map;
 
     public Map() {
@@ -129,5 +129,25 @@ public class Map {
             }
         }
         return noOfNewVisitedPoints;
+    }
+
+    public int getNoOfVisitedPoints() {
+        int noOfVisitedPoints = 0;
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < map[0].length; j++) {
+                noOfVisitedPoints += isVisited(i, j) ? 1 : 0;
+            }
+        }
+        return noOfVisitedPoints;
+    }
+
+    public int getNoOfVisitablePoints() {
+        int noOfNonObstaclesPoints = 0;
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < map[0].length; j++) {
+                noOfNonObstaclesPoints += map[i][j] < 3 ? 1 : 0;
+            }
+        }
+        return noOfNonObstaclesPoints;
     }
 }

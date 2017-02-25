@@ -15,22 +15,20 @@ public class VirtualBot
 {
 
     public static final int SENSOR_ROTATION_RADIUS = 5;
-
-    public static final int BOT_SIZE = 24;
+    private static final int BOT_DIMENSION = 24; //length and width both equal 24
+    private static final int HALF_BOT_DIMENSION = BOT_DIMENSION / 2;
     private static final int MIN_ROTATION_ANGLE = 3; //smaller angle than 3 does nothing while using int coordinates
     private static final int ROTATIONS_PER_90_DEGREE_ANGLE = 1077;
     private static final int ROTATIONS_PER_CENTIMETER = 36;
 
     private Point2D leftMotorPosition;
     private Point2D rightMotorPosition;
-    private Point2D previousCenter;
     private Point2D center;
     private Point2D sensorRotationPoint;
     private Map map;
     private Path2D contour;
     private Rectangle footprint;
     private float orientation; //angle between 0-360 degrees
-    private int noOfNewVisitedPoints; //no of points changed as visited in the last move (move(rr,lr) called from outside)
     private Runnable repaintTrigger;
     private boolean touchingObstacle;
 
@@ -38,7 +36,6 @@ public class VirtualBot
     {
 
         this.center = new Point2D.Float(centerX, centerY);
-        this.previousCenter = center;
         this.orientation = orientation;
         this.map = map;
 
@@ -55,23 +52,20 @@ public class VirtualBot
 
     public int getRightMotorRotation(int[] d)
     {
-        return (((d[0] + d[0]) + ((d[0] + (((d[0] + d[0]) - d[4]) - d[4])) - d[4])) + (d[0] + d[0]));
+        return (d[7] + d[0]) + ((d[7] + d[0]) + ((d[0] - 42) * d[4]));
     }
 
     public int getLeftMotorRotations(int[] d)
     {
-        return (d[10] + (d[2] + ((d[10] + (d[2] + (d[2] + (((d[10] - d[14]) - d[14]) + d[4])))) - d[14])));
+        return ((d[2] + ((d[6] + d[6]) + d[2])) + d[2]) + d[2];
     }
 
     public void move(int rightMotorRotation, int leftMotorRotation)
     {
-        previousCenter = new Point2D.Float((float) center.getX(), (float) center.getY());
         if (rightMotorRotation == 0 && leftMotorRotation == 0)
         {
             return;
         }
-
-        noOfNewVisitedPoints = 0;
         if ((rightMotorRotation > 0 && leftMotorRotation > 0) || (rightMotorRotation < 0 && leftMotorRotation < 0))
         {
             sameSignMovement(rightMotorRotation, leftMotorRotation);
@@ -115,18 +109,13 @@ public class VirtualBot
             rotation.apply(direction);
             updateBotPoints();
             if (repaintTrigger != null) repaintTrigger.run();
-            markNewAreaAsVisited();
+            map.markAsVisited(footprint);
             updateIsTouchingObstacle();
             if (isTouchingObstacle())
             {
                 break;
             }
         }
-    }
-
-    private void markNewAreaAsVisited()
-    {
-        noOfNewVisitedPoints += map.markAsVisited(footprint);
     }
 
     private void updateBotPoints()
@@ -180,7 +169,7 @@ public class VirtualBot
             rightMotorPosition = GeometryHelper.move(rightMotorPosition, direction, orientation);
             updateBotPoints();
             if (repaintTrigger != null) repaintTrigger.run();
-            markNewAreaAsVisited();
+            map.markAsVisited(footprint);
             updateIsTouchingObstacle();
             if (isTouchingObstacle())
                 break;
@@ -305,14 +294,14 @@ public class VirtualBot
     private void updateBotContourAndFootprint()
     {
         contour = new Path2D.Float();
-        Point2D frontCenter = GeometryHelper.move(center, BOT_SIZE / 2, orientation); //front
-        Point2D frontLeft = GeometryHelper.move(frontCenter, BOT_SIZE / 2, orientation + 90);
-        Point2D frontRight = GeometryHelper.move(frontCenter, BOT_SIZE / 2, orientation - 90);
+        Point2D frontCenter = GeometryHelper.move(center, HALF_BOT_DIMENSION, orientation); //front
+        Point2D frontLeft = GeometryHelper.move(frontCenter, HALF_BOT_DIMENSION, orientation + 90);
+        Point2D frontRight = GeometryHelper.move(frontCenter, HALF_BOT_DIMENSION, orientation - 90);
 
         float backOrientation = this.orientation + 180;
-        Point2D backCenter = GeometryHelper.move(center, BOT_SIZE / 2, backOrientation);
-        Point2D backLeft = GeometryHelper.move(backCenter, BOT_SIZE / 2, backOrientation - 90);
-        Point2D backRight = GeometryHelper.move(backCenter, BOT_SIZE / 2, backOrientation + 90);
+        Point2D backCenter = GeometryHelper.move(center, HALF_BOT_DIMENSION, backOrientation);
+        Point2D backLeft = GeometryHelper.move(backCenter, HALF_BOT_DIMENSION, backOrientation - 90);
+        Point2D backRight = GeometryHelper.move(backCenter, HALF_BOT_DIMENSION, backOrientation + 90);
 
 
         contour.moveTo(frontLeft.getX(), frontLeft.getY());
@@ -323,11 +312,6 @@ public class VirtualBot
 
         Rectangle2D bounds2D = contour.getBounds2D();
         footprint = new Rectangle(round(bounds2D.getX()), round(bounds2D.getY()), round(bounds2D.getWidth()), round(bounds2D.getHeight()));
-    }
-
-    public int getNoOfNewVisitedPoints()
-    {
-        return noOfNewVisitedPoints;
     }
 
     public Point2D getSensorRotationPoint()

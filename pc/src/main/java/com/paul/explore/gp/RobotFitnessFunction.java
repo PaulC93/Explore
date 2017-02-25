@@ -2,6 +2,7 @@ package com.paul.explore.gp;
 
 import com.paul.explore.sim.VirtualBot;
 import com.paul.explore.sim.VirtualMap;
+import org.apache.log4j.Logger;
 import org.jgap.gp.CommandGene;
 import org.jgap.gp.GPFitnessFunction;
 import org.jgap.gp.IGPProgram;
@@ -12,6 +13,8 @@ public class RobotFitnessFunction extends GPFitnessFunction {
     private int noOfInputs;
     private int noOfSteps;
     private static final Object[] NO_ARGS = new Object[0];
+    private static final Logger LOGGER = Logger.getLogger(Main.class);
+    private boolean maximumDeltaLogged = false;
 
     public RobotFitnessFunction(int noOfInputs, int noOfSteps) {
         this.noOfInputs = noOfInputs;
@@ -19,10 +22,15 @@ public class RobotFitnessFunction extends GPFitnessFunction {
     }
 
     protected double evaluate(IGPProgram a_subject) {
-        double fitness = 0;
-        VirtualBot virtualBot = new VirtualBot(15, 15, 0, new VirtualMap());
+        VirtualMap map = new VirtualMap();
+        VirtualBot virtualBot = new VirtualBot(15, 15, 0, map);
         int[] distances = virtualBot.scan();
         boolean touchSensorIsTouchingObstacle = virtualBot.touchSensorIsTouchingObstacle();
+        if (!maximumDeltaLogged)
+        {
+            LOGGER.info(" Maximum delta (noOfVisitablePoints) is " + map.getNoOfVisitablePoints());
+            maximumDeltaLogged = true;
+        }
         // Evaluate function for noOfSteps steps
         // ---------------------- -------------------
         for (int i = 0; i < noOfSteps; i++) {
@@ -39,11 +47,10 @@ public class RobotFitnessFunction extends GPFitnessFunction {
             distances = virtualBot.scan();
             touchSensorIsTouchingObstacle = virtualBot.touchSensorIsTouchingObstacle();
             if (virtualBot.isTouchingObstacle()) {
-                return 0;
+                return Integer.MAX_VALUE;
             }
-            fitness += virtualBot.getNoOfNewVisitedPoints();
         }
-        return fitness;
+        return map.getNoOfVisitablePoints() - map.getNoOfVisitedPoints();
     }
 }
 

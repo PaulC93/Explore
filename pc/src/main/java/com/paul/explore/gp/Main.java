@@ -1,6 +1,5 @@
 package com.paul.explore.gp;
 
-import org.jgap.gp.impl.DefaultGPFitnessEvaluator;
 import org.apache.log4j.Logger;
 import org.jgap.gp.impl.DeltaGPFitnessEvaluator;
 import org.jgap.gp.impl.GPConfiguration;
@@ -28,7 +27,7 @@ public class Main {
         // ---------------------------------
         GPConfiguration config = new GPConfiguration();
         // ----------------------------------------------------------------------
-        config.setGPFitnessEvaluator(new DefaultGPFitnessEvaluator());
+        config.setGPFitnessEvaluator(new DeltaGPFitnessEvaluator());
         config.setMaxInitDepth(4);
         config.setPopulationSize(populationSize);
         config.setMaxCrossoverDepth(8);

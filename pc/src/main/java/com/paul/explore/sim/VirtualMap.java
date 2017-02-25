@@ -6,11 +6,15 @@ import java.awt.geom.Point2D;
 
 import static com.paul.explore.model.GeometryHelper.move;
 import static com.paul.explore.model.GeometryHelper.round;
+import static java.lang.Math.sqrt;
 
 public class VirtualMap extends Map {
 
+    public static final int MAP_SIZE = 40000;
+
     public VirtualMap(){
-        map = new byte[200][200];
+        int dimension = (int) sqrt(MAP_SIZE);
+        map = new byte[dimension][dimension];
         createObstacles();
     }
 
@@ -54,7 +58,7 @@ public class VirtualMap extends Map {
         }
     }
 
-    public int getDistance(Point2D sensorPosition, float orientation) {
+    int getDistance(Point2D sensorPosition, float orientation) {
         for (int i = 0; i < 55; i++) {
             Point2D sensedPoint = move(sensorPosition, i, orientation);
             int x = round(sensedPoint.getX());
@@ -65,12 +69,5 @@ public class VirtualMap extends Map {
             }
         }
         return 55;
-    }
-
-    public void clear() {
-        for (int i = 0; i < getHeight(); i++)
-            for (int j = 0; j < getWidth(); j++) {
-                map[i][j] = FREE;
-            }
     }
 }
