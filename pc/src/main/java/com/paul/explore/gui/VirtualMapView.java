@@ -17,19 +17,14 @@ public class VirtualMapView extends MapView {
     }
 
     public static void main(String[] args) throws Exception {
-
-        int hitCounts = 0;
-        VirtualBot virtualBot = new VirtualBot(15, 15, 90, new VirtualMap());
+        VirtualMap map = new VirtualMap();
+        VirtualBot virtualBot = new VirtualBot(15, 15, 90, map);
         new VirtualMapView(virtualBot);
 
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 135; i++) {
             int[] distances = virtualBot.getDistances();
+            map.markFreeArea(virtualBot.getCenter(), virtualBot.getOrientation(), distances);
             virtualBot.move(virtualBot.getRightMotorRotation(distances), virtualBot.getLeftMotorRotations(distances));
-            if (virtualBot.isTouchingObstacle()) {
-                hitCounts++;
-                System.out.println("this individual should have died");
-            }
         }
-        System.out.println(hitCounts);
     }
 }

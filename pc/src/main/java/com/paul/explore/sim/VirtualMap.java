@@ -6,15 +6,11 @@ import java.awt.geom.Point2D;
 
 import static com.paul.explore.model.GeometryHelper.move;
 import static com.paul.explore.model.GeometryHelper.round;
-import static java.lang.Math.sqrt;
 
 public class VirtualMap extends Map {
 
-    public static final int MAP_SIZE = 40000;
-
     public VirtualMap(){
-        int dimension = (int) sqrt(MAP_SIZE);
-        map = new byte[dimension][dimension];
+         super(200);
         createObstacles();
     }
 

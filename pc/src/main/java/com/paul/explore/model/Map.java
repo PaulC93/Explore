@@ -12,12 +12,14 @@ public class Map {
     private static final int VISITED = 2;   //010
     protected static final int OBSTACLE = 7;//111
     protected byte[][] map;
+    private final int DIMENSION;
 
-    public Map() {
-        map = new byte[800][800];
+    public Map(int dimension) {
+        DIMENSION = dimension;
+        map = new byte[DIMENSION][DIMENSION];
     }
 
-    public void addArea(Point2D botCenter, float orientation, int[] distances) {
+    public void markFreeArea(Point2D botCenter, float orientation, int[] distances) {
 
         Point2D sensorRotationPoint = move(botCenter, 5, orientation);
         Polygon freeArea = new Polygon();
@@ -39,10 +41,10 @@ public class Map {
             int y = round(sensedPoint.getY());
             freeArea.addPoint(x, y);
 
-            freeAreaMinX = updateMinIfNecessary(freeAreaMinX, x);
-            freeAreaMaxX = updateMaxIfNecessary(freeAreaMaxX, x);
-            freeAreaMinY = updateMinIfNecessary(freeAreaMinY, y);
-            freeAreaMaxY = updateMaxIfNecessary(freeAreaMaxY, y);
+            freeAreaMinX = forceInMapBoundaries(updateMinIfNecessary(freeAreaMinX, x));
+            freeAreaMaxX = forceInMapBoundaries(updateMaxIfNecessary(freeAreaMaxX, x));
+            freeAreaMinY = forceInMapBoundaries(updateMinIfNecessary(freeAreaMinY, y));
+            freeAreaMaxY = forceInMapBoundaries(updateMaxIfNecessary(freeAreaMaxY, y));
         }
 
         //FREE
@@ -63,6 +65,12 @@ public class Map {
 
     private static int updateMinIfNecessary(int currentMin, int potentialNewMin) {
         return potentialNewMin < currentMin ? potentialNewMin : currentMin;
+    }
+
+    private int forceInMapBoundaries(int p) {
+        if (p < 0) return 0;
+        if (p > DIMENSION) return DIMENSION - 1;
+        return p;
     }
 
     public boolean isObstacle(Point sensedPoint) {

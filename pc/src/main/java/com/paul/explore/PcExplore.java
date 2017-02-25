@@ -43,7 +43,7 @@ public class PcExplore
         }
         System.out.println("Connected");
 
-        Map map = new Map();
+        Map map = new Map(800);
         VirtualBot virtualBot = new VirtualBot(400, 400, 90, map);
 
         new MapView(virtualBot);
@@ -52,7 +52,7 @@ public class PcExplore
         {
             while (botConnection.readData())
             {
-                map.addArea(virtualBot.getCenter(), virtualBot.getOrientation(), botConnection.getDistances());
+                map.markFreeArea(virtualBot.getCenter(), virtualBot.getOrientation(), botConnection.getDistances());
                 virtualBot.move(botConnection.getRightMotorRotations(), botConnection.getLeftMotorRotations());
             }
             botConnection.close();
