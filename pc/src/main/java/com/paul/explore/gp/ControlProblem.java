@@ -18,7 +18,7 @@ public class ControlProblem extends GPProblem {
     public ControlProblem(GPConfiguration a_conf, int noOfInputs) throws InvalidConfigurationException {
         super(a_conf);
         this.noOfInputs = noOfInputs;
-        distances = new Variable[noOfInputs];
+        distances = new Variable[16];
     }
 
     /**
@@ -49,7 +49,7 @@ public class ControlProblem extends GPProblem {
         // We use 17 variables that can be set in the fitness function.
         // 16 for distances around
         // 1 for the touch sensor
-        for (int i = 0; i < noOfInputs; i++) {
+        for (int i = 0; i < 16; i++) {
             distances[i] = Variable.create(conf, "d[" + i + "]", CommandGene.IntegerClass);
         }
         touchingObstacle = Variable.create(conf, "t", CommandGene.BooleanClass);
@@ -64,14 +64,14 @@ public class ControlProblem extends GPProblem {
         CommandGene[] commandGenes;
         switch (noOfInputs) {
             case 4:
-                commandGenes = new CommandGene[]{distances[0], distances[1], distances[2], distances[3], touchingObstacle, add, subtract, multiply, xor, or, and, terminal};
+                commandGenes = new CommandGene[]{distances[2], distances[6], distances[10], distances[14], touchingObstacle, add, subtract, multiply, xor, or, and, terminal};
                 break;
             case 16:
                 commandGenes = new CommandGene[]{distances[0], distances[1], distances[2], distances[3], distances[4], distances[5], distances[6], distances[7], distances[8], distances[9], distances[10], distances[11], distances[12], distances[13], distances[14], distances[15], touchingObstacle, add, subtract, multiply, xor, or, and, terminal};
                 break;
             case 8:
             default:
-                commandGenes = new CommandGene[]{distances[0], distances[1], distances[2], distances[3], distances[4], distances[5], distances[6], distances[7], touchingObstacle, add, subtract, multiply, xor, or, and, terminal};
+                commandGenes = new CommandGene[]{distances[0], distances[2], distances[4], distances[6], distances[8], distances[10], distances[12], distances[14], touchingObstacle, add, subtract, multiply, xor, or, and, terminal};
         }
         CommandGene[][] nodeSets = {commandGenes, commandGenes};
         // Create genotype with initial population. Here, we use the declarations

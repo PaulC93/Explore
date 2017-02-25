@@ -36,8 +36,27 @@ public class RobotFitnessFunction extends GPFitnessFunction {
         for (int i = 0; i < noOfSteps; i++) {
             // Provide the sensory input
             CommandGene[] variables = a_subject.getNodeSets()[0];
-            for (int j = 0; j < noOfInputs; j++) {
-                ((Variable) variables[j]).set(distances[j]);
+            switch (noOfInputs) {
+                case 4:
+                    ((Variable) variables[0]).set(distances[2]);
+                    ((Variable) variables[1]).set(distances[6]);
+                    ((Variable) variables[2]).set(distances[10]);
+                    ((Variable) variables[3]).set(distances[14]);
+                    break;
+                case 16:
+                    for (int j = 0; j < 16; j++) {
+                        ((Variable) variables[j]).set(distances[j]);
+                    } break;
+                case 8:
+                default:
+                    ((Variable) variables[0]).set(distances[0]);
+                    ((Variable) variables[1]).set(distances[2]);
+                    ((Variable) variables[2]).set(distances[4]);
+                    ((Variable) variables[3]).set(distances[6]);
+                    ((Variable) variables[4]).set(distances[8]);
+                    ((Variable) variables[5]).set(distances[10]);
+                    ((Variable) variables[6]).set(distances[12]);
+                    ((Variable) variables[7]).set(distances[14]);
             }
             ((Variable) variables[noOfInputs]).set(touchSensorIsTouchingObstacle);
             // Execute the GP program representing the functions to be evolved.
