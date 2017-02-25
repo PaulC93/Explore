@@ -11,9 +11,10 @@ public class VirtualMap extends Map {
 
     public VirtualMap(){
         map = new byte[200][200];
+        createObstacles();
     }
 
-    public void createObstacles() {
+    private void createObstacles() {
 
         //create obstacles //TODO more real life like
         int usualObstacleSize = 30;

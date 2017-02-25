@@ -12,18 +12,14 @@ import com.paul.explore.sim.VirtualMap;
 public class VirtualMapView extends MapView {
 
 
-    public VirtualMapView(VirtualBot virtualBot) {
+    private VirtualMapView(VirtualBot virtualBot) {
         super(virtualBot);
     }
 
     public static void main(String[] args) throws Exception {
 
         int hitCounts = 0;
-
-        VirtualMap virtualMap = new VirtualMap();
-        virtualMap.createObstacles();
-        VirtualBot virtualBot = new VirtualBot(15, 15, 90, virtualMap);
-
+        VirtualBot virtualBot = new VirtualBot(15, 15, 90, new VirtualMap());
         new VirtualMapView(virtualBot);
 
         for (int i = 0; i < 10000; i++) {

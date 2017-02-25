@@ -72,7 +72,7 @@ class VirtualBotTest extends Specification {
 
         given:
         def map = new VirtualMap()
-        //map.createObstacles()
+        //MAP.createObstacles()
         VirtualBot virtualBot = new VirtualBot(12, 12, o, map)
         //VirtualMapView mapView = new VirtualMapView(virtualBot)
 

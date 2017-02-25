@@ -1,10 +1,14 @@
 package com.paul.explore.gp;
 
 import org.jgap.gp.impl.DefaultGPFitnessEvaluator;
+import org.apache.log4j.Logger;
+import org.jgap.gp.impl.DeltaGPFitnessEvaluator;
 import org.jgap.gp.impl.GPConfiguration;
 import org.jgap.gp.impl.GPGenotype;
 
 public class Main {
+
+    private static final Logger LOGGER = Logger.getLogger(Main.class);
 
     public static void main(String[] args) throws Exception {
         int noOfGenerations = 800;
@@ -15,7 +19,7 @@ public class Main {
             noOfGenerations = Integer.parseInt(args[1]);
             noOfInputs = Integer.parseInt(args[2]);
         }
-        System.out.println("Running with  " + populationSize + " populationSize " + noOfGenerations + " generations " + noOfInputs + " inputs");
+        LOGGER.info("Running with  " + populationSize + " populationSize " + noOfGenerations + " generations " + noOfInputs + " inputs");
         run(populationSize, noOfGenerations, noOfInputs);
     }
 
