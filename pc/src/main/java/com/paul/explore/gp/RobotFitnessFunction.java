@@ -28,7 +28,7 @@ public class RobotFitnessFunction extends GPFitnessFunction {
         boolean touchSensorIsTouchingObstacle = virtualBot.touchSensorIsTouchingObstacle();
         if (!maximumDeltaLogged)
         {
-            LOGGER.info(" Maximum delta (noOfVisitablePoints) is " + map.getNoOfVisitablePoints());
+            LOGGER.info(" Maximum delta (noOfNonObstaclePoints) is " + map.getNoOfNonObstaclePoints());
             maximumDeltaLogged = true;
         }
         // Evaluate function for noOfSteps steps
@@ -44,13 +44,14 @@ public class RobotFitnessFunction extends GPFitnessFunction {
             int rightMotorRotations = a_subject.execute_int(0, NO_ARGS);
             int leftMotorRotations = a_subject.execute_int(1, NO_ARGS);
             virtualBot.move(rightMotorRotations, leftMotorRotations);
+            map.markFreeArea(virtualBot.getCenter(), virtualBot.getOrientation(), distances);
             distances = virtualBot.scan();
             touchSensorIsTouchingObstacle = virtualBot.touchSensorIsTouchingObstacle();
             if (virtualBot.isTouchingObstacle()) {
                 return Integer.MAX_VALUE;
             }
         }
-        return map.getNoOfVisitablePoints() - map.getNoOfVisitedPoints();
+        return map.getNoOfNonObstaclePoints() - map.getNoOfPointsObservedAsFree();
     }
 }
 

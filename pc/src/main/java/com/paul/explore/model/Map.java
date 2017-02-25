@@ -10,7 +10,7 @@ public class Map {
     private static final int UNKNOWN = 0;   //000 //default
     private static final int FREE = 1;      //001
     private static final int VISITED = 2;   //010
-    protected static final int OBSTACLE = 7;//111
+    protected static final int OBSTACLE = 4;//100
     protected byte[][] map;
     private final int DIMENSION;
 
@@ -52,11 +52,15 @@ public class Map {
             for (int y = freeAreaMinY; y < freeAreaMaxY; y++) {
                 if (map[x][y] == UNKNOWN) {
                     if (freeArea.contains(x, y)) {
-                        map[x][y] = FREE;
+                        markAsFree(x, y);
                     }
                 }
             }
         }
+    }
+
+    private void markAsFree(int x, int y) {
+        map[x][y] |= FREE;
     }
 
     private static int updateMaxIfNecessary(int currentMax, int potentialNewMax) {
@@ -92,19 +96,19 @@ public class Map {
 
     public boolean isVisited(int x, int y) {
         //while trying to sense something outside the map return true
-        return isOutsideOfMap(x, y) || map[x][y] == VISITED;
+        return isOutsideOfMap(x, y) || (map[x][y] & VISITED) == VISITED;
     }
 
     public boolean isFree(int x, int y) {
         //while trying to sense something outside the map return false
-        return !isOutsideOfMap(x, y) && map[x][y] == FREE;
+        return !isOutsideOfMap(x, y) && (map[x][y] & FREE) == FREE;
     }
 
     private boolean isOutsideOfMap(int x, int y) {
         return x < 0 || y < 0 || x > getWidth() || y > getHeight();
     }
 
-    public int markAsVisited(Rectangle footprint) {
+    public void markAsVisited(Rectangle footprint) {
 
         int w = getWidth();
         int h = getHeight();
@@ -112,48 +116,50 @@ public class Map {
         int startX = footprint.x;
         int endX = round(footprint.getMaxX());
         if (startX < 0) startX = 0;
-        if (startX > w) return 0;
-        if (endX < 0) return 0;
+        if (startX > w) return;
+        if (endX < 0) return;
         if (endX > w) endX = w;
 
         int startY = footprint.y;
         int endY = round(footprint.getMaxY());
         if (startY < 0) startY = 0;
-        if (startY > h) return 0;
-        if (endY < 0) return 0;
+        if (startY > h) return;
+        if (endY < 0) return;
         if (endY > h) endY = h;
 
-        return getNoOfNewVisitedPoints(startX, endX, startY, endY);
+        markAreaAsVisited(startX, endX, startY, endY);
     }
 
-    private int getNoOfNewVisitedPoints(int startX, int endX, int startY, int endY) {
-        int noOfNewVisitedPoints = 0;
+    private void markAreaAsVisited(int startX, int endX, int startY, int endY) {
         for (int x = startX; x < endX; x++) {
             for (int y = startY; y < endY; y++) {
-                if (map[x][y] < 2) {  //different than obstacle should always be true
-                    map[x][y] = VISITED;                             // the VirtualBot could be improved when bot moves don't stop when the contour reaches
-                    noOfNewVisitedPoints++;                         // obstacle but when a corner touches an obstacle the rest of the bot continues
+                if (map[x][y] < 4) {  //different than obstacle should always be true
+                    markAsVisited(x, y);    // the VirtualBot could be improved when bot moves don't stop when the contour reaches
+                   // obstacle but when a corner touches an obstacle the rest of the bot continues
                 }
             }
         }
-        return noOfNewVisitedPoints;
     }
 
-    public int getNoOfVisitedPoints() {
-        int noOfVisitedPoints = 0;
+    private void markAsVisited(int x, int y) {
+        map[x][y] |= VISITED;
+    }
+
+    public int getNoOfPointsObservedAsFree() {
+        int noOfPointsObservedAsFree = 0;
         for (int i = 0; i < map.length; i++) {
             for (int j = 0; j < map[0].length; j++) {
-                noOfVisitedPoints += isVisited(i, j) ? 1 : 0;
+                noOfPointsObservedAsFree += isFree(i, j) ? 1 : 0;
             }
         }
-        return noOfVisitedPoints;
+        return noOfPointsObservedAsFree;
     }
 
-    public int getNoOfVisitablePoints() {
+    public int getNoOfNonObstaclePoints() {
         int noOfNonObstaclesPoints = 0;
         for (int i = 0; i < map.length; i++) {
             for (int j = 0; j < map[0].length; j++) {
-                noOfNonObstaclesPoints += map[i][j] < 3 ? 1 : 0;
+                noOfNonObstaclesPoints += isObstacle(i, j) ? 0 : 1;
             }
         }
         return noOfNonObstaclesPoints;

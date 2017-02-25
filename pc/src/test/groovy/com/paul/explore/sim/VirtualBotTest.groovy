@@ -27,8 +27,8 @@ class VirtualBotTest extends Specification {
     def 'should move'() {
 
         given:
-        int cX = (rx + lx) / 2 + 150;
-        int cY = (ry + ly) / 2 + 150;
+        int cX = (rx + lx) / 2 + 150
+        int cY = (ry + ly) / 2 + 150
         VirtualBot virtualBot = new VirtualBot(cX, cY, initialOrientation, new VirtualMap())
         //VirtualMapView mapView = new VirtualMapView(virtualBot)
 
