@@ -52,12 +52,12 @@ public class VirtualBot
 
     public int getRightMotorRotation(int[] d)
     {
-        return (d[7] + d[0]) + ((d[7] + d[0]) + ((d[0] - 42) * d[4]));
+        return (d[14] - (d[4] - (d[14] - (d[4] - (((d[14] - (d[4] - d[4])) + d[12]) + d[12]))))) + d[14];
     }
 
     public int getLeftMotorRotations(int[] d)
     {
-        return ((d[2] + ((d[6] + d[6]) + d[2])) + d[2]) + d[2];
+        return d[4] - (d[10] - (d[4] - (((d[10] - (d[4] - ((d[10] - d[4]) - d[4]))) - d[4]) - d[4])));
     }
 
     public void move(int rightMotorRotation, int leftMotorRotation)

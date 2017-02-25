@@ -10,7 +10,12 @@ import static com.paul.explore.model.GeometryHelper.round;
 public class VirtualMap extends Map {
 
     public VirtualMap(){
-         super(200);
+       this(200);
+    }
+
+    public VirtualMap(int dimension)
+    {
+        super(dimension);
         createObstacles();
     }
 
