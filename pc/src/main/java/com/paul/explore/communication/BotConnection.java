@@ -1,4 +1,4 @@
-package com.paul.explore;
+package com.paul.explore.communication;
 
 import java.io.DataInputStream;
 import java.io.IOException;

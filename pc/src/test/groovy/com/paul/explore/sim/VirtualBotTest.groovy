@@ -1,13 +1,10 @@
 package com.paul.explore.sim
 
-import com.paul.explore.gui.VirtualMapView
 import spock.lang.Specification
 
-import java.awt.*
-import java.awt.geom.Area
 import java.awt.geom.Point2D
 
-import static com.paul.explore.sim.GeometryHelper.round
+import static com.paul.explore.model.GeometryHelper.round
 
 class VirtualBotTest extends Specification {
 

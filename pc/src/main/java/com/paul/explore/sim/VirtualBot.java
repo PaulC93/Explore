@@ -1,6 +1,7 @@
 package com.paul.explore.sim;
 
-import com.paul.explore.Map;
+import com.paul.explore.model.GeometryHelper;
+import com.paul.explore.model.Map;
 
 import java.awt.*;
 import java.awt.geom.Path2D;
@@ -8,7 +9,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.function.IntFunction;
 
-import static com.paul.explore.sim.GeometryHelper.*;
+import static com.paul.explore.model.GeometryHelper.*;
 
 public class VirtualBot
 {

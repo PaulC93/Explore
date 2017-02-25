@@ -1,5 +1,6 @@
 package com.paul.explore
 
+import com.paul.explore.model.Map
 import spock.lang.Specification
 
 class MapTest extends Specification {

@@ -5,8 +5,8 @@ import spock.lang.Specification
 import java.awt.*
 import java.awt.geom.Point2D
 
-import static com.paul.explore.sim.GeometryHelper.normalizeAngle
-import static com.paul.explore.sim.GeometryHelper.rotateAround
+import static com.paul.explore.model.GeometryHelper.normalizeAngle
+import static com.paul.explore.model.GeometryHelper.rotateAround
 
 class GeometryHelperTest extends Specification {
 

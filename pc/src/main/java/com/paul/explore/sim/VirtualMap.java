@@ -1,11 +1,11 @@
 package com.paul.explore.sim;
 
-import com.paul.explore.Map;
+import com.paul.explore.model.Map;
 
 import java.awt.geom.Point2D;
 
-import static com.paul.explore.sim.GeometryHelper.move;
-import static com.paul.explore.sim.GeometryHelper.round;
+import static com.paul.explore.model.GeometryHelper.move;
+import static com.paul.explore.model.GeometryHelper.round;
 
 public class VirtualMap extends Map {
 

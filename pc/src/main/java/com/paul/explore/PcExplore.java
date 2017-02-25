@@ -1,6 +1,8 @@
 package com.paul.explore;
 
+import com.paul.explore.communication.BotConnection;
 import com.paul.explore.gui.MapView;
+import com.paul.explore.model.Map;
 import com.paul.explore.sim.VirtualBot;
 
 import javax.swing.*;

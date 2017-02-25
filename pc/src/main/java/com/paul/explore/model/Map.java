@@ -1,10 +1,9 @@
-package com.paul.explore;
+package com.paul.explore.model;
 
 import java.awt.*;
-import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 
-import static com.paul.explore.sim.GeometryHelper.*;
+import static com.paul.explore.model.GeometryHelper.*;
 
 public class Map {
 
@@ -18,7 +17,7 @@ public class Map {
         map = new byte[800][800];
     }
 
-    void addArea(Point2D botCenter, float orientation, int[] distances) {
+    public void addArea(Point2D botCenter, float orientation, int[] distances) {
 
         Point2D sensorRotationPoint = move(botCenter, 5, orientation);
         Polygon freeArea = new Polygon();

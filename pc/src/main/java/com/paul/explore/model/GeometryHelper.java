@@ -1,4 +1,4 @@
-package com.paul.explore.sim;
+package com.paul.explore.model;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;

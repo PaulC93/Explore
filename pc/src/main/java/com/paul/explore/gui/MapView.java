@@ -1,6 +1,6 @@
 package com.paul.explore.gui;
 
-import com.paul.explore.Map;
+import com.paul.explore.model.Map;
 import com.paul.explore.sim.VirtualBot;
 
 import javax.swing.*;
@@ -10,7 +10,7 @@ import java.awt.geom.Point2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
-import static com.paul.explore.sim.GeometryHelper.round;
+import static com.paul.explore.model.GeometryHelper.round;
 import static com.paul.explore.sim.VirtualBot.SENSOR_ROTATION_RADIUS;
 import static java.awt.Color.*;
 
