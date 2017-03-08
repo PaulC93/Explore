@@ -57,21 +57,19 @@ public class ControlProblem extends GPProblem {
         Add add = new Add(conf, CommandGene.IntegerClass);
         Subtract subtract = new Subtract(conf, CommandGene.IntegerClass);
         Multiply multiply = new Multiply(conf, CommandGene.IntegerClass);
-        Xor xor = new Xor(conf);
-        Or or = new Or(conf);
-        And and = new And(conf);
+        Divide divide = new Divide(conf, CommandGene.IntegerClass);
         Terminal terminal = new Terminal(conf, CommandGene.IntegerClass, 0.0d, 55.0d, true);
         CommandGene[] commandGenes;
         switch (noOfInputs) {
             case 4:
-                commandGenes = new CommandGene[]{distances[2], distances[6], distances[10], distances[14], touchingObstacle, add, subtract, multiply, xor, or, and, terminal};
+                commandGenes = new CommandGene[]{distances[2], distances[6], distances[10], distances[14], touchingObstacle, add, subtract, multiply, divide, terminal};
                 break;
             case 16:
-                commandGenes = new CommandGene[]{distances[0], distances[1], distances[2], distances[3], distances[4], distances[5], distances[6], distances[7], distances[8], distances[9], distances[10], distances[11], distances[12], distances[13], distances[14], distances[15], touchingObstacle, add, subtract, multiply, xor, or, and, terminal};
+                commandGenes = new CommandGene[]{distances[0], distances[1], distances[2], distances[3], distances[4], distances[5], distances[6], distances[7], distances[8], distances[9], distances[10], distances[11], distances[12], distances[13], distances[14], distances[15], touchingObstacle, add, subtract, multiply, divide, terminal};
                 break;
             case 8:
             default:
-                commandGenes = new CommandGene[]{distances[0], distances[2], distances[4], distances[6], distances[8], distances[10], distances[12], distances[14], touchingObstacle, add, subtract, multiply, xor, or, and, terminal};
+                commandGenes = new CommandGene[]{distances[0], distances[2], distances[4], distances[6], distances[8], distances[10], distances[12], distances[14], touchingObstacle, add, subtract, multiply, divide, terminal};
         }
         CommandGene[][] nodeSets = {commandGenes, commandGenes};
         // Create genotype with initial population. Here, we use the declarations
