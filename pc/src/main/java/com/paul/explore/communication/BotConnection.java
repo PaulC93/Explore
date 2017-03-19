@@ -2,22 +2,50 @@ package com.paul.explore.communication;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.net.Socket;
 
 public class BotConnection
 {
-    private final int PORT = 80;
-
+    private static final int MULTI_CAST_PORT = 4446;
+    private static final String IP_GROUP = "224.0.0.0";
+    private static final int SYNC_PORT = 5000;
     private Socket socket;
     private int[] distances = new int[16];
     private int rightMotorRotations;
     private int leftMotorRotations;
     private DataInputStream dataInputStream;
 
-    public BotConnection(String ip) throws IOException
+    public boolean connect()
     {
-        socket = new Socket(ip, PORT);
-        dataInputStream = new DataInputStream(socket.getInputStream());
+        try
+        {
+            String expectedString = "I am MindStorm";
+            String receivedString = null;
+            MulticastSocket multicastSocket = new MulticastSocket(MULTI_CAST_PORT);
+            InetAddress group = InetAddress.getByName(IP_GROUP);
+            multicastSocket.joinGroup(group);
+            byte[] buffer = new byte[expectedString.length()];
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+            while (!expectedString.equals(receivedString))
+            {
+                multicastSocket.receive(packet);
+                receivedString = new String(packet.getData());
+            }
+            multicastSocket.leaveGroup(group);
+            multicastSocket.close();
+            String hostAddress = packet.getAddress().getHostAddress();
+            System.out.println("Attempting to connect on " + hostAddress + ":" + SYNC_PORT);
+            socket = new Socket(hostAddress, SYNC_PORT);
+            dataInputStream = new DataInputStream(socket.getInputStream());
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
     public boolean readData() throws IOException

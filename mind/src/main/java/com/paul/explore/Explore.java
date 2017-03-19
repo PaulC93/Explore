@@ -9,12 +9,8 @@ import lejos.robotics.RegulatedMotor;
 import lejos.robotics.RegulatedMotorListener;
 import lejos.utility.Delay;
 
-import java.io.IOException;
-import java.util.Arrays;
-
 public class Explore
 {
-
     private static final int NO_OF_DISTANCE_SAMPLES = 16;
     private static final int SPEED = 360;
     private static final RegulatedMotor leftMotor = Motor.B;
@@ -30,34 +26,46 @@ public class Explore
         try
         {
             setupSpeedsAndMotorsCallbacks();
-            System.out.println("Waiting PC connection...");
-            PcConnection connection = new PcConnection();
+            OptionalConnection optionalConnection = attemptConnection();
 
             while (Button.ENTER.isUp())
             {
-                int distances[] = scan(); //sense
+                System.out.println("Sensing...");
+                int distances[] = scan();
 
+                System.out.println("Thinking...");
                 int rightMotorRotation = getRightMotorRotation(distances);
                 int leftMotorRotations = getLeftMotorRotations(distances);
-                connection.sendSensorsAndMotorData(distances, rightMotorRotation, leftMotorRotations);
+                optionalConnection.sendSensorsAndMotorData(distances, rightMotorRotation, leftMotorRotations);
 
-                move(rightMotorRotation, leftMotorRotations); //act
+                System.out.println("Acting...");
+                move(rightMotorRotation, leftMotorRotations);
 
                 while (rightMotorRotates || leftMotorRotates)
                 { //fail safe
                     ifIsTouchingObstacleStopMotors();
                 }
             }
-            connection.close();
-        } catch (IOException e)
-        {
-            stopAllMovement();
-            System.out.println("Connection problems, please retry");
+            optionalConnection.close();
         } catch (LowBatteryException e)
         {
             stopAllMovement();
             System.out.println("Battery level to low, please change the battery and try again");
         }
+    }
+
+    private static OptionalConnection attemptConnection()
+    {
+        OptionalConnection connection = new OptionalConnection();
+        boolean connected = connection.tryConnect();
+        if (connected)
+        {
+            System.out.println("Connected");
+        } else
+        {
+            System.out.println("Cannot connect to a monitoring system, will reattempt on each scan");
+        }
+        return connection;
     }
 
     /**
@@ -164,7 +172,6 @@ public class Explore
 
     private static int[] scan()
     {
-
         //sensor rotates clockwise
         sensorMotor.rotate(-45); //assume sensor face straight ahead, move slightly left
         sensorMotor.rotate(360, true);
@@ -198,7 +205,7 @@ public class Explore
         {
             distances[i] = samples[i] < 55 ? Math.round(samples[i]) : 55;
         }
-        System.out.println(Arrays.toString(distances));
+        //System.out.println(Arrays.toString(distances));
         return distances;
     }
 }

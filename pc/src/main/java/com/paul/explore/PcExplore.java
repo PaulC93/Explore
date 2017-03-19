@@ -10,35 +10,12 @@ import java.io.IOException;
 
 public class PcExplore
 {
-    private static String botIp = "192.168.43.140";
-    private static final int MAX_NO_OF_ATTEMPTS = 50;
-
     public static void main(String[] args)
     {
-
-        System.out.println("Attempting to connect, please wait...");
-        BotConnection botConnection = null;
-        int noOfAttempts = 0;
-
-        while (botConnection == null && noOfAttempts < MAX_NO_OF_ATTEMPTS)
+        BotConnection  botConnection = new BotConnection();
+        if (!botConnection.connect())
         {
-            noOfAttempts++;
-            try
-            {
-                botConnection = new BotConnection(botIp);
-            } catch (IOException e)
-            {
-                System.out.println(e.getMessage());
-                botIp = "";
-                while (invalidIp())
-                {
-                    botIp = JOptionPane.showInputDialog("Bot IP:");
-                }
-            }
-        }
-        if (botConnection == null)
-        {
-            JOptionPane.showMessageDialog(null, "Unable to connect after " + MAX_NO_OF_ATTEMPTS + " attempts. Aborting");
+            JOptionPane.showMessageDialog(null, "Unable to connect. Aborting");
             return;
         }
         System.out.println("Connected");
@@ -61,22 +38,5 @@ public class PcExplore
             System.out.println("Connection problems, please retry");
             e.printStackTrace();
         }
-    }
-
-    private static boolean invalidIp()
-    {
-        String[] ipv4 = botIp.split("\\.");
-        for (String anInt : ipv4)
-        {
-            try
-            {
-                //noinspection ResultOfMethodCallIgnored
-                Integer.parseInt(anInt);
-            } catch (NumberFormatException e)
-            {
-                return true;
-            }
-        }
-        return ipv4.length != 4;
     }
 }
