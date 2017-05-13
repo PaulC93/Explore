@@ -7,13 +7,16 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.Socket;
 
+import static com.paul.explore.model.BotConstants.NO_OF_DISTANCES_READ;
+
 public class BotConnection
 {
     private static final int MULTI_CAST_PORT = 4446;
     private static final String IP_GROUP = "224.0.0.0";
     private static final int SYNC_PORT = 5000;
+    private static final String EXPECTED_STRING = "I am MindStorm";
     private Socket socket;
-    private int[] distances = new int[16];
+    private int[] distances = new int[NO_OF_DISTANCES_READ];
     private int rightMotorRotations;
     private int leftMotorRotations;
     private DataInputStream dataInputStream;
@@ -22,14 +25,13 @@ public class BotConnection
     {
         try
         {
-            String expectedString = "I am MindStorm";
             String receivedString = null;
             MulticastSocket multicastSocket = new MulticastSocket(MULTI_CAST_PORT);
             InetAddress group = InetAddress.getByName(IP_GROUP);
             multicastSocket.joinGroup(group);
-            byte[] buffer = new byte[expectedString.length()];
+            byte[] buffer = new byte[EXPECTED_STRING.length()];
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-            while (!expectedString.equals(receivedString))
+            while (!EXPECTED_STRING.equals(receivedString))
             {
                 multicastSocket.receive(packet);
                 receivedString = new String(packet.getData());
@@ -42,7 +44,7 @@ public class BotConnection
             dataInputStream = new DataInputStream(socket.getInputStream());
         } catch (IOException e)
         {
-            e.printStackTrace();
+           // e.printStackTrace();
             return false;
         }
         return true;

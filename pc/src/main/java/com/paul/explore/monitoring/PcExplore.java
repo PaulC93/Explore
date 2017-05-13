@@ -1,4 +1,4 @@
-package com.paul.explore;
+package com.paul.explore.monitoring;
 
 import com.paul.explore.communication.BotConnection;
 import com.paul.explore.gui.MapView;
@@ -12,7 +12,7 @@ public class PcExplore
 {
     public static void main(String[] args)
     {
-        BotConnection  botConnection = new BotConnection();
+        BotConnection botConnection = new BotConnection();
         if (!botConnection.connect())
         {
             JOptionPane.showMessageDialog(null, "Unable to connect. Aborting");
@@ -33,10 +33,10 @@ public class PcExplore
                 virtualBot.move(botConnection.getRightMotorRotations(), botConnection.getLeftMotorRotations());
             }
             botConnection.close();
-        }catch (IOException e)
+        } catch (IOException e)
         {
             System.out.println("Connection problems, please retry");
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 }

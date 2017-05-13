@@ -22,7 +22,7 @@ public class VirtualMapView extends MapView {
         new VirtualMapView(virtualBot);
 
         for (int i = 0; i < 135; i++) {
-            int[] distances = virtualBot.getDistances();
+            int[] distances = virtualBot.scan();
             map.markFreeArea(virtualBot.getCenter(), virtualBot.getOrientation(), distances);
             virtualBot.move(virtualBot.getRightMotorRotation(distances), virtualBot.getLeftMotorRotations(distances));
         }

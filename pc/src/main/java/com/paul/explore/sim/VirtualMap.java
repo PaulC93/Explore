@@ -6,11 +6,14 @@ import java.awt.geom.Point2D;
 
 import static com.paul.explore.model.GeometryHelper.move;
 import static com.paul.explore.model.GeometryHelper.round;
+import static com.paul.explore.model.BotConstants.MAX_OBSERVABLE_DISTANCE;
 
 public class VirtualMap extends Map {
 
+    private static final int DIMENSION = 200;
+
     public VirtualMap(){
-       this(200);
+       this(DIMENSION);
     }
 
     public VirtualMap(int dimension)
@@ -60,7 +63,7 @@ public class VirtualMap extends Map {
     }
 
     int getDistance(Point2D sensorPosition, float orientation) {
-        for (int i = 0; i < 55; i++) {
+        for (int i = 0; i < MAX_OBSERVABLE_DISTANCE; i++) {
             Point2D sensedPoint = move(sensorPosition, i, orientation);
             int x = round(sensedPoint.getX());
             int y = round(sensedPoint.getY());
@@ -69,6 +72,6 @@ public class VirtualMap extends Map {
                 return i;
             }
         }
-        return 55;
+        return MAX_OBSERVABLE_DISTANCE;
     }
 }

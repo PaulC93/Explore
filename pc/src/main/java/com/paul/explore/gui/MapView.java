@@ -11,7 +11,7 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
 import static com.paul.explore.model.GeometryHelper.round;
-import static com.paul.explore.sim.VirtualBot.SENSOR_ROTATION_RADIUS;
+import static com.paul.explore.model.BotConstants.SENSOR_ROTATION_RADIUS;
 import static java.awt.Color.*;
 
 /**
@@ -22,7 +22,6 @@ import static java.awt.Color.*;
  */
 public class MapView extends JFrame
 {
-
     private VirtualBot virtualBot;
     private Map map;
 
@@ -31,7 +30,7 @@ public class MapView extends JFrame
         this.virtualBot = virtualBot;
         map = virtualBot.getMap();
         setUpUI();
-        virtualBot.registerRepaintCallBack(this::repaintMe);
+        virtualBot.registerRepaintCallback(this::repaintMe);
     }
 
     private void setUpUI()
@@ -70,7 +69,7 @@ public class MapView extends JFrame
             Thread.sleep(10);
         } catch (InterruptedException e)
         {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 

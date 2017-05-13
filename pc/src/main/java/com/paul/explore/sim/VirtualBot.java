@@ -7,19 +7,14 @@ import java.awt.*;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.function.IntFunction;
+import java.util.function.Consumer;
 
 import static com.paul.explore.model.GeometryHelper.*;
+import static com.paul.explore.model.BotConstants.*;
 
 public class VirtualBot
 {
-
-    public static final int SENSOR_ROTATION_RADIUS = 5;
-    private static final int BOT_DIMENSION = 24; //length and width both equal 24
-    private static final int HALF_BOT_DIMENSION = BOT_DIMENSION / 2;
     private static final int MIN_ROTATION_ANGLE = 3; //smaller angle than 3 does nothing while using int coordinates
-    private static final int ROTATIONS_PER_90_DEGREE_ANGLE = 1077;
-    private static final int ROTATIONS_PER_CENTIMETER = 36;
 
     private Point2D leftMotorPosition;
     private Point2D rightMotorPosition;
@@ -46,8 +41,8 @@ public class VirtualBot
 
     private void initMotorPositions()
     {
-        leftMotorPosition = GeometryHelper.move(center, 10, orientation + 90);
-        rightMotorPosition = GeometryHelper.move(center, 10, orientation - 90);
+        leftMotorPosition = GeometryHelper.move(center, CENTER_TO_MOTOR_DISTANCE, orientation + 90);
+        rightMotorPosition = GeometryHelper.move(center, CENTER_TO_MOTOR_DISTANCE, orientation - 90);
     }
 
     public int getRightMotorRotation(int[] d)
@@ -84,31 +79,32 @@ public class VirtualBot
         int direction = rightMotorRotation < leftMotorRotation ? -1 : 1; //clockwise or counterclockwise rotation
         float angle = 2 * toAngle(rotations); // * 2 because both motors rotate in opposite direction
 
-        IntFunction rotation = rotateAroundCenter();
+        Consumer<Integer> rotation = rotateAroundCenter();
         rotate(rotation, direction, angle);
 
-        if (absRightMotorRotation > absLeftMotorRotation)
-        {
-            angle = direction * toAngle(absRightMotorRotation - absLeftMotorRotation);
-            rotation = rotateAroundLeftMotor();
+        angle = direction * toAngle(Math.abs(absRightMotorRotation - absLeftMotorRotation));
+        rotateAroundOneMotor(absRightMotorRotation, absLeftMotorRotation, direction, angle);
+    }
 
-        } else
-        {
-            angle = direction * toAngle(absLeftMotorRotation - absRightMotorRotation);
-            rotation = rotateAroundRightMotor();
-        }
+    private void rotateAroundOneMotor(int absRightMotorRotation, int absLeftMotorRotation, int direction, float angle)
+    {
+        Consumer<Integer> rotation;
+        rotation = absRightMotorRotation > absLeftMotorRotation ? rotateAroundLeftMotor() : rotateAroundRightMotor();
         rotate(rotation, direction, angle);
     }
 
-    private void rotate(IntFunction rotation, int direction, float angle)
+    private void rotate(Consumer<Integer> rotation, int unitAngle, float angle)
     {
         //unit by unit to prevent entering an obstacle
         int abs = Math.round(Math.abs(angle));
         for (int i = 0; i < abs; i += MIN_ROTATION_ANGLE)
         {
-            rotation.apply(direction);
+            rotation.accept(unitAngle);
             updateBotPoints();
-            if (repaintTrigger != null) repaintTrigger.run();
+            if (repaintTrigger != null)
+            {
+                repaintTrigger.run();
+            }
             map.markAsVisited(footprint);
             updateIsTouchingObstacle();
             if (isTouchingObstacle())
@@ -161,14 +157,17 @@ public class VirtualBot
     private void move(int distance)
     {
         distance = toCentimeters(distance);
-        int direction = distance < 0 ? -1 : 1;
+        int unitDistance = distance < 0 ? -1 : 1;
         //unit by unit movement for prevent entering an obstacle
         for (int i = 0; i < Math.abs(distance); i++)
         {
-            leftMotorPosition = GeometryHelper.move(leftMotorPosition, direction, orientation);
-            rightMotorPosition = GeometryHelper.move(rightMotorPosition, direction, orientation);
+            leftMotorPosition = GeometryHelper.move(leftMotorPosition, unitDistance, orientation);
+            rightMotorPosition = GeometryHelper.move(rightMotorPosition, unitDistance, orientation);
             updateBotPoints();
-            if (repaintTrigger != null) repaintTrigger.run();
+            if (repaintTrigger != null)
+            {
+                repaintTrigger.run();
+            }
             map.markAsVisited(footprint);
             updateIsTouchingObstacle();
             if (isTouchingObstacle())
@@ -176,86 +175,60 @@ public class VirtualBot
         }
     }
 
-    private int toCentimeters(int distance)
-    {
-        return distance / ROTATIONS_PER_CENTIMETER; //360 degrees -> 10 cm
-    }
-
     private void rotate(int rightMotorRotation, int leftMotorRotation)
     {
-
         int absRightMotorRotation = Math.abs(rightMotorRotation);
         int absLeftMotorRotation = Math.abs(leftMotorRotation);
         int direction = rightMotorRotation < leftMotorRotation ? -1 : 1; //clockwise or counterclockwise rotation
         float angle = toAngle(rightMotorRotation - leftMotorRotation);
 
-        IntFunction rotation;
-        if (absRightMotorRotation > absLeftMotorRotation)
-        {
-            rotation = rotateAroundLeftMotor();
-        } else
-        {
-            rotation = rotateAroundRightMotor();
-        }
-
-        rotate(rotation, direction, angle);
+        rotateAroundOneMotor(absRightMotorRotation, absLeftMotorRotation, direction, angle);
     }
 
 
-    private IntFunction rotateAroundCenter()
+    private Consumer<Integer> rotateAroundCenter()
     {
         return (d) ->
         {
             rightMotorPosition = rotateAround(center, rightMotorPosition, d * MIN_ROTATION_ANGLE);
             leftMotorPosition = rotateAround(center, leftMotorPosition, d * MIN_ROTATION_ANGLE);
             setOrientation(orientation + d * MIN_ROTATION_ANGLE);
-            return 0; //ignored
         };
     }
 
-    private IntFunction rotateAroundRightMotor()
+    private Consumer<Integer> rotateAroundRightMotor()
     {
-        return (d) -> {
+        return (d) ->
+        {
             leftMotorPosition = rotateAround(rightMotorPosition, leftMotorPosition, d * MIN_ROTATION_ANGLE);
             setOrientation(orientation + d * MIN_ROTATION_ANGLE);
-            return 0; //ignored
         };
     }
 
-    private IntFunction rotateAroundLeftMotor()
+    private Consumer<Integer> rotateAroundLeftMotor()
     {
-        return (d) -> {
+        return (d) ->
+        {
             rightMotorPosition = rotateAround(leftMotorPosition, rightMotorPosition, d * MIN_ROTATION_ANGLE);
             setOrientation(orientation + d * MIN_ROTATION_ANGLE);
-            return 0; //ignored
         };
-    }
-
-    private int toAngle(int rotations)
-    {
-        return (90 * rotations / ROTATIONS_PER_90_DEGREE_ANGLE);
-    }
-
-    public int[] scan()
-    {
-        return getDistances();
     }
 
     /**
      * only for simulation, uses VirtualMap for distances, normal map will throw exception
      */
-    public int[] getDistances()
+    public int[] scan()
     {
         Point2D sensorPosition = GeometryHelper.move(sensorRotationPoint, SENSOR_ROTATION_RADIUS, orientation);
-        float sensorOrientation = orientation + 45;
+        float sensorOrientation = orientation + SENSOR_INITIAL_SHIFT;
         sensorPosition = rotateAround(sensorRotationPoint, sensorPosition, sensorOrientation); //sensor face straight ahead (same orientation as bot), move slightly left
 
-        int[] distances = new int[16];
+        int[] distances = new int[NO_OF_DISTANCES_READ];
         for (int i = 0; i < distances.length; i++)
         {
             distances[i] = ((VirtualMap) map).getDistance(sensorPosition, sensorOrientation);
-            sensorPosition = rotateAround(sensorRotationPoint, sensorPosition, 22.5f);
-            sensorOrientation -= 22.5; //22.5 degrees for each side
+            sensorPosition = rotateAround(sensorRotationPoint, sensorPosition, SENSOR_MOVEMENT_ANGLE);
+            sensorOrientation -= SENSOR_MOVEMENT_ANGLE; //22.5 degrees for each side
         }
         return distances;
     }
@@ -282,7 +255,7 @@ public class VirtualBot
 
     public boolean touchSensorIsTouchingObstacle()
     {
-        Point2D sensorPosition = GeometryHelper.move(center, 11, orientation); //11cm from bot center till touch sensor
+        Point2D sensorPosition = GeometryHelper.move(center, CENTER_TO_TOUCH_SENSOR_DISTANCE, orientation); //11cm from bot center till touch sensor
         return map.isObstacle(round(sensorPosition.getX()), round(sensorPosition.getY()));
     }
 
@@ -329,7 +302,7 @@ public class VirtualBot
         return contour;
     }
 
-    public void registerRepaintCallBack(Runnable runnable)
+    public void registerRepaintCallback(Runnable runnable)
     {
         repaintTrigger = runnable;
     }
