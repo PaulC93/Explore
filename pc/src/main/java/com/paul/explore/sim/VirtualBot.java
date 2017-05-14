@@ -9,8 +9,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.function.Consumer;
 
-import static com.paul.explore.model.GeometryHelper.*;
 import static com.paul.explore.model.BotConstants.*;
+import static com.paul.explore.model.GeometryHelper.*;
 
 public class VirtualBot
 {
@@ -47,12 +47,12 @@ public class VirtualBot
 
     public int getRightMotorRotation(int[] d)
     {
-        return (d[14] - (d[4] - (d[14] - (d[4] - (((d[14] - (d[4] - d[4])) + d[12]) + d[12]))))) + d[14];
+        return (d[10] + d[14]) + d[14];
     }
 
     public int getLeftMotorRotations(int[] d)
     {
-        return d[4] - (d[10] - (d[4] - (((d[10] - (d[4] - ((d[10] - d[4]) - d[4]))) - d[4]) - d[4])));
+        return d[6] + (d[10] + 42);
     }
 
     public void move(int rightMotorRotation, int leftMotorRotation)
@@ -253,12 +253,6 @@ public class VirtualBot
         orientation = normalizeAngle(angle);
     }
 
-    public boolean touchSensorIsTouchingObstacle()
-    {
-        Point2D sensorPosition = GeometryHelper.move(center, CENTER_TO_TOUCH_SENSOR_DISTANCE, orientation); //11cm from bot center till touch sensor
-        return map.isObstacle(round(sensorPosition.getX()), round(sensorPosition.getY()));
-    }
-
     public Map getMap()
     {
         return map;
@@ -312,7 +306,7 @@ public class VirtualBot
         return touchingObstacle;
     }
 
-    private boolean updateIsTouchingObstacle()
+    private void updateIsTouchingObstacle()
     {
         touchingObstacle = false;
 
@@ -327,7 +321,7 @@ public class VirtualBot
             if (map.isObstacle(x, y))
             {
                 touchingObstacle = true;
-                return true;
+                return;
             }
         }
 
@@ -337,7 +331,7 @@ public class VirtualBot
             if (map.isObstacle(x, y))
             {
                 touchingObstacle = true;
-                return true;
+                return;
             }
         }
 
@@ -347,7 +341,7 @@ public class VirtualBot
             if (map.isObstacle(xi, y))
             {
                 touchingObstacle = true;
-                return true;
+                return;
             }
         }
 
@@ -357,9 +351,8 @@ public class VirtualBot
             if (map.isObstacle(xi, y))
             {
                 touchingObstacle = true;
-                return true;
+                return;
             }
         }
-        return touchingObstacle;
     }
 }

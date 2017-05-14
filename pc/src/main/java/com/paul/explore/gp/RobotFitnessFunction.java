@@ -24,8 +24,7 @@ public class RobotFitnessFunction extends GPFitnessFunction {
     protected double evaluate(IGPProgram a_subject) {
         VirtualMap map = new VirtualMap();
         VirtualBot virtualBot = new VirtualBot(15, 15, 0, map);
-        int[] distances = virtualBot.scan();
-        boolean touchSensorIsTouchingObstacle = virtualBot.touchSensorIsTouchingObstacle();
+        int[] distances;
         if (!maximumDeltaLogged)
         {
             LOGGER.info(" Maximum delta (noOfNonObstaclePoints) is " + map.getNoOfNonObstaclePoints());
@@ -35,15 +34,11 @@ public class RobotFitnessFunction extends GPFitnessFunction {
         // ---------------------- -------------------
         for (int i = 0; i < noOfSteps; i++) {
             // Provide the sensory input
-            CommandGene[] variables = a_subject.getNodeSets()[0];
-            setVariables(distances, touchSensorIsTouchingObstacle, variables);
-            // Execute the GP program representing the functions to be evolved.
-            int rightMotorRotations = a_subject.execute_int(0, NO_ARGS);
-            int leftMotorRotations = a_subject.execute_int(1, NO_ARGS);
-            virtualBot.move(rightMotorRotations, leftMotorRotations);
-            map.markFreeArea(virtualBot.getCenter(), virtualBot.getOrientation(), distances);
             distances = virtualBot.scan();
-            touchSensorIsTouchingObstacle = virtualBot.touchSensorIsTouchingObstacle();
+            setVariables(distances, a_subject.getNodeSets()[0]);
+            // Execute the GP program representing the functions to be evolved.
+            virtualBot.move(a_subject.execute_int(0, NO_ARGS), a_subject.execute_int(1, NO_ARGS));
+            map.markFreeArea(virtualBot.getCenter(), virtualBot.getOrientation(), distances);
             if (virtualBot.isTouchingObstacle()) {
                 return Integer.MAX_VALUE;
             }
@@ -51,7 +46,7 @@ public class RobotFitnessFunction extends GPFitnessFunction {
         return map.getNoOfNonObstaclePoints() - map.getNoOfPointsObservedAsFree();
     }
 
-    private void setVariables(int[] distances, boolean touchSensorIsTouchingObstacle, CommandGene[] variables)
+    private void setVariables(int[] distances, CommandGene[] variables)
     {
         switch (noOfInputs) {
             case 4:
@@ -75,7 +70,6 @@ public class RobotFitnessFunction extends GPFitnessFunction {
                 ((Variable) variables[6]).set(distances[12]);
                 ((Variable) variables[7]).set(distances[14]);
         }
-        ((Variable) variables[noOfInputs]).set(touchSensorIsTouchingObstacle);
     }
 }
 
