@@ -1,12 +1,14 @@
 package com.paul.explore.model;
 
+import com.paul.explore.sim.RotatingSensor;
+
 import java.awt.*;
 import java.awt.geom.Point2D;
 
-import static com.paul.explore.model.GeometryHelper.*;
 import static com.paul.explore.model.BotConstants.SENSOR_INITIAL_SHIFT;
 import static com.paul.explore.model.BotConstants.SENSOR_MOVEMENT_ANGLE;
-import static com.paul.explore.model.BotConstants.SENSOR_ROTATION_RADIUS;
+import static com.paul.explore.model.GeometryHelper.move;
+import static com.paul.explore.model.GeometryHelper.round;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
@@ -16,6 +18,7 @@ public class Map
     private static final int FREE = 1;      //001
     private static final int VISITED = 2;   //010
     protected static final int OBSTACLE = 4;//100
+    protected static final int OBSERVED_AS_OBSTACLE = 8;//1000
     protected byte[][] map;
     private final int dimension;
 
@@ -25,33 +28,35 @@ public class Map
         map = new byte[dimension][dimension];
     }
 
-    public void markFreeArea(Point2D botCenter, float orientation, int[] distances)
+    public void markObservedArea(RotatingSensor rotatingSensor, int[] distances)
     {
-        Point2D sensorRotationPoint = move(botCenter, SENSOR_ROTATION_RADIUS, orientation);
-        float sensorOrientation = orientation + SENSOR_INITIAL_SHIFT;
-
         Polygon freeArea = new Polygon();
         int freeAreaMinX = Integer.MAX_VALUE;
         int freeAreaMaxX = Integer.MIN_VALUE;
         int freeAreaMinY = Integer.MAX_VALUE;
         int freeAreaMaxY = Integer.MIN_VALUE;
 
+        float shift = SENSOR_INITIAL_SHIFT;
+
         for (int distance : distances)
         {
-            sensorOrientation -= SENSOR_MOVEMENT_ANGLE;
-            Point2D sensorPosition = move(sensorRotationPoint, SENSOR_ROTATION_RADIUS, sensorOrientation);
-            sensorPosition = rotateAround(sensorRotationPoint, sensorPosition, sensorOrientation);
+            rotatingSensor.rotate(shift);
+            Point2D sensedPoint = move(rotatingSensor.getPosition(), distance, rotatingSensor.getOrientation());
 
-            //FREE
-            Point2D sensedPoint = move(sensorPosition, distance, sensorOrientation);
             int x = round(sensedPoint.getX());
             int y = round(sensedPoint.getY());
-            freeArea.addPoint(x, y);
 
+            freeArea.addPoint(x, y);
             freeAreaMinX = forceInMapBoundaries(min(freeAreaMinX, x));
             freeAreaMaxX = forceInMapBoundaries(max(freeAreaMaxX, x));
             freeAreaMinY = forceInMapBoundaries(min(freeAreaMinY, y));
             freeAreaMaxY = forceInMapBoundaries(max(freeAreaMaxY, y));
+
+            if (distance < 55)
+            {
+                markObservedAsObstacle(sensedPoint);
+            }
+            shift -= SENSOR_MOVEMENT_ANGLE;
         }
 
         //FREE
@@ -70,6 +75,21 @@ public class Map
         }
     }
 
+    private void markObservedAsObstacle(Point2D obstaclePoint)
+    {
+        int x = round(obstaclePoint.getX());
+        int y = round(obstaclePoint.getY());
+        if (!isOutsideOfMap(x, y))
+        {
+            map[x][y] |= OBSERVED_AS_OBSTACLE;
+        }
+    }
+
+    public boolean isObservedAsObstacle(int x, int y)
+    {
+        return (map[x][y] & OBSERVED_AS_OBSTACLE) == OBSERVED_AS_OBSTACLE;
+    }
+
     private void markAsFree(int x, int y)
     {
         map[x][y] |= FREE;
@@ -85,7 +105,7 @@ public class Map
     public boolean isObstacle(Point sensedPoint)
     {
         //while trying to sense something outside the map return true
-        return isOutsideOfMap(sensedPoint.x, sensedPoint.y) || map[sensedPoint.x][sensedPoint.y] == OBSTACLE;
+        return isOutsideOfMap(sensedPoint.x, sensedPoint.y) || (map[sensedPoint.x][sensedPoint.y] & OBSTACLE) == OBSTACLE;
     }
 
     public int getHeight()

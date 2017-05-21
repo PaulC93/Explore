@@ -10,8 +10,8 @@ import java.awt.geom.Point2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
-import static com.paul.explore.model.GeometryHelper.round;
 import static com.paul.explore.model.BotConstants.SENSOR_ROTATION_RADIUS;
+import static com.paul.explore.model.GeometryHelper.round;
 import static java.awt.Color.*;
 
 /**
@@ -87,15 +87,25 @@ public class MapView extends JFrame
             {
                 for (int x = 0; x < map.getWidth(); x++)
                 {
-                    if (map.isObstacle(x, y))
-                    {
-                        drawPoint(g, new Point(x, y));
-                    } else if (map.isVisited(x, y))
-                    {
-                        drawPoint(g, new Point(x, y), Color.YELLOW);
-                    } else if (map.isFree(x, y))
+                    if (map.isFree(x, y))
                     {
                         drawPoint(g, new Point(x, y), Color.WHITE);
+                    }
+                    if (map.isVisited(x, y))
+                    {
+                        drawPoint(g, new Point(x, y), Color.YELLOW);
+                    }
+                    if (map.isObstacle(x, y))
+                    {
+                        drawPoint(g, new Point(x, y), Color.BLACK);
+                    }
+                    if (map.isObservedAsObstacle(x, y) && !map.isObstacle(x, y))
+                    {
+                        drawPoint(g, new Point(x, y), Color.BLUE);
+                    }
+                    if (map.isObstacle(x, y) && map.isObservedAsObstacle(x, y))
+                    {
+                        drawPoint(g, new Point(x, y), Color.MAGENTA);
                     }
                 }
                 drawBot(g2);
@@ -115,35 +125,29 @@ public class MapView extends JFrame
             g2.fillOval(x, y, sensorRotationDiameter, sensorRotationDiameter);
         }
 
-        private void drawPoint(Graphics g, Point point)
-        {
-            drawPoint(g, point, Color.BLACK);
-        }
-
         private void drawPoint(Graphics g, Point point, Color color)
         {
             g.setColor(color);
             g.drawLine(point.x, point.y, point.x, point.y);
         }
 
-    }
+        @Override
+        public void paint(Graphics g)
+        {
+            BufferedImage im = new BufferedImage(this.getWidth(), this.getHeight(),
+                    BufferedImage.TYPE_3BYTE_BGR);
+            // Paint normally but on the image
+            super.paint(im.getGraphics());
 
-    @Override
-    public void paint(Graphics g)
-    {
-        BufferedImage im = new BufferedImage(this.getWidth(), this.getHeight(),
-                BufferedImage.TYPE_3BYTE_BGR);
-        // Paint normally but on the image
-        super.paint(im.getGraphics());
+            // Reverse the image
+            AffineTransform tx = AffineTransform.getScaleInstance(1, -1);
+            tx.translate(0, -im.getHeight());
+            AffineTransformOp op = new AffineTransformOp(tx,
+                    AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+            im = op.filter(im, null);
 
-        // Reverse the image
-        AffineTransform tx = AffineTransform.getScaleInstance(1, -1);
-        tx.translate(0, -im.getHeight());
-        AffineTransformOp op = new AffineTransformOp(tx,
-                AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-        im = op.filter(im, null);
-
-        // Draw the reversed image on the screen
-        g.drawImage(im, 0, 0, null);
+            // Draw the reversed image on the screen
+            g.drawImage(im, 0, 0, null);
+        }
     }
 }

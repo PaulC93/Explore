@@ -24,8 +24,8 @@ class RobotFitnessFunctionSpec extends Specification {
 
         where:
         rmr  | lmr  | expectedFitness
-        1000 | 1000 | 31540
-        0    | 0    | 31507
+        1000 | 1000 | 31281
+        0    | 0    | 31173
         9000 | 9000 | Integer.MAX_VALUE
     }
 }

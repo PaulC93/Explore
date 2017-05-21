@@ -29,7 +29,7 @@ public class PcExplore
         {
             while (botConnection.readData())
             {
-                map.markFreeArea(virtualBot.getCenter(), virtualBot.getOrientation(), botConnection.getDistances());
+                map.markObservedArea(virtualBot.getRotatingSensor(), botConnection.getDistances());
                 virtualBot.move(botConnection.getRightMotorRotations(), botConnection.getLeftMotorRotations());
             }
             botConnection.close();

@@ -21,9 +21,9 @@ public class VirtualMapView extends MapView {
         VirtualBot virtualBot = new VirtualBot(15, 15, 90, map);
         new VirtualMapView(virtualBot);
 
-        for (int i = 0; i < 135; i++) {
+        for (int i = 0; i < 5000; i++) {
             int[] distances = virtualBot.scan();
-            map.markFreeArea(virtualBot.getCenter(), virtualBot.getOrientation(), distances);
+            map.markObservedArea(virtualBot.getRotatingSensor(), distances);
             virtualBot.move(virtualBot.getRightMotorRotation(distances), virtualBot.getLeftMotorRotations(distances));
         }
     }

@@ -13,6 +13,7 @@ public final class BotConstants
     public static final int MAX_OBSERVABLE_DISTANCE = 55;
     public static final int NO_OF_DISTANCES_READ = 16;
     public static final int CENTER_TO_TOUCH_SENSOR_DISTANCE = 11;
+    public static final int CENTER_TO_IR_SENSOR_ROTATION_POINT_DISTANCE = 5;
 
     public static int toCentimeters(int rotations)
     {
