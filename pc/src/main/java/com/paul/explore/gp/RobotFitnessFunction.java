@@ -38,7 +38,7 @@ public class RobotFitnessFunction extends GPFitnessFunction {
             setVariables(distances, a_subject.getNodeSets()[0]);
             // Execute the GP program representing the functions to be evolved.
             virtualBot.move(a_subject.execute_int(0, NO_ARGS), a_subject.execute_int(1, NO_ARGS));
-            map.markFreeArea(virtualBot.getCenter(), virtualBot.getOrientation(), distances);
+            map.markObservedArea(virtualBot.getRotatingSensor(), distances);
             if (virtualBot.isTouchingObstacle()) {
                 return Integer.MAX_VALUE;
             }
@@ -60,7 +60,6 @@ public class RobotFitnessFunction extends GPFitnessFunction {
                     ((Variable) variables[j]).set(distances[j]);
                 } break;
             case 8:
-            default:
                 ((Variable) variables[0]).set(distances[0]);
                 ((Variable) variables[1]).set(distances[2]);
                 ((Variable) variables[2]).set(distances[4]);
@@ -69,6 +68,8 @@ public class RobotFitnessFunction extends GPFitnessFunction {
                 ((Variable) variables[5]).set(distances[10]);
                 ((Variable) variables[6]).set(distances[12]);
                 ((Variable) variables[7]).set(distances[14]);
+            default:
+                ((Variable) variables[0]).set(distances[0]);
         }
     }
 }

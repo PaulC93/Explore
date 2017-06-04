@@ -5,10 +5,9 @@ import spock.lang.Specification
 import java.awt.*
 import java.awt.geom.Point2D
 
-import static com.paul.explore.model.GeometryHelper.normalizeAngle
-import static com.paul.explore.model.GeometryHelper.rotateAround
+import static com.paul.explore.model.GeometryHelper.*
 
-class GeometryHelperTest extends Specification {
+class GeometryHelperSpec extends Specification {
 
     def 'should normalize angle'() {
         expect:
@@ -24,8 +23,12 @@ class GeometryHelperTest extends Specification {
     }
 
     def 'should rotate around'() {
-
         expect:
         rotateAround(new Point(0, 0), new Point(0, -10), 90) == new Point2D.Double(10, 0)
+    }
+
+    def 'should move'() {
+        expect:
+        move(new Point(75, 95), 55, -90) == new Point2D.Double(75.0, 40.0)
     }
 }

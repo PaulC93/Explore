@@ -19,7 +19,7 @@ public class VirtualBot
     private Point2D leftMotorPosition;
     private Point2D rightMotorPosition;
     private Point2D center;
-    private Point2D sensorRotationPoint;
+    private RotatingSensor rotatingSensor;
     private Map map;
     private Path2D contour;
     private Rectangle footprint;
@@ -34,25 +34,27 @@ public class VirtualBot
         this.orientation = orientation;
         this.map = map;
 
-        initMotorPositions();
+        initMotorAndSensorPositions();
         updateBotPoints();
         map.markAsVisited(footprint);
     }
 
-    private void initMotorPositions()
+    private void initMotorAndSensorPositions()
     {
         leftMotorPosition = GeometryHelper.move(center, CENTER_TO_MOTOR_DISTANCE, orientation + 90);
         rightMotorPosition = GeometryHelper.move(center, CENTER_TO_MOTOR_DISTANCE, orientation - 90);
+        Point2D sensorRotationPoint = GeometryHelper.move(center, SENSOR_ROTATION_RADIUS, orientation);
+        rotatingSensor = new RotatingSensor(sensorRotationPoint, CENTER_TO_IR_SENSOR_ROTATION_POINT_DISTANCE, orientation);
     }
 
     public int getRightMotorRotation(int[] d)
     {
-        return (d[10] + d[14]) + d[14];
+        return (d[14] - (d[4] - (d[14] - (d[4] - (((d[14] - (d[4] - d[4])) + d[12]) + d[12]))))) + d[14];
     }
 
     public int getLeftMotorRotations(int[] d)
     {
-        return d[6] + (d[10] + 42);
+        return d[4] - (d[10] - (d[4] - (((d[10] - (d[4] - ((d[10] - d[4]) - d[4]))) - d[4]) - d[4])));
     }
 
     public void move(int rightMotorRotation, int leftMotorRotation)
@@ -117,7 +119,7 @@ public class VirtualBot
     private void updateBotPoints()
     {
         updateBotCenter();
-        updateSensorRotationPoint();
+        updateRotatingSensor();
         updateBotContourAndFootprint();
     }
 
@@ -126,9 +128,9 @@ public class VirtualBot
         center.setLocation((rightMotorPosition.getX() + leftMotorPosition.getX()) / 2, (rightMotorPosition.getY() + leftMotorPosition.getY()) / 2);
     }
 
-    private void updateSensorRotationPoint()
+    private void updateRotatingSensor()
     {
-        sensorRotationPoint = GeometryHelper.move(center, SENSOR_ROTATION_RADIUS, orientation);
+        rotatingSensor.reset(GeometryHelper.move(center, CENTER_TO_IR_SENSOR_ROTATION_POINT_DISTANCE, orientation), orientation);
     }
 
     private void sameSignMovement(int rightMotorRotation, int leftMotorRotation)
@@ -219,16 +221,13 @@ public class VirtualBot
      */
     public int[] scan()
     {
-        Point2D sensorPosition = GeometryHelper.move(sensorRotationPoint, SENSOR_ROTATION_RADIUS, orientation);
-        float sensorOrientation = orientation + SENSOR_INITIAL_SHIFT;
-        sensorPosition = rotateAround(sensorRotationPoint, sensorPosition, sensorOrientation); //sensor face straight ahead (same orientation as bot), move slightly left
-
+        float shift = SENSOR_INITIAL_SHIFT;
         int[] distances = new int[NO_OF_DISTANCES_READ];
         for (int i = 0; i < distances.length; i++)
         {
-            distances[i] = ((VirtualMap) map).getDistance(sensorPosition, sensorOrientation);
-            sensorPosition = rotateAround(sensorRotationPoint, sensorPosition, SENSOR_MOVEMENT_ANGLE);
-            sensorOrientation -= SENSOR_MOVEMENT_ANGLE; //22.5 degrees for each side
+            rotatingSensor.rotate(shift);
+            distances[i] = ((VirtualMap) map).getDistance(rotatingSensor.getPosition(), rotatingSensor.getOrientation());
+            shift -= SENSOR_MOVEMENT_ANGLE; //22.5 degrees for each side
         }
         return distances;
     }
@@ -283,12 +282,7 @@ public class VirtualBot
 
     public Point2D getSensorRotationPoint()
     {
-        return sensorRotationPoint;
-    }
-
-    public Point2D getCenter()
-    {
-        return center;
+        return rotatingSensor.getAnchor();
     }
 
     public Path2D getContour()
@@ -354,5 +348,10 @@ public class VirtualBot
                 return;
             }
         }
+    }
+
+    public RotatingSensor getRotatingSensor()
+    {
+        return rotatingSensor;
     }
 }

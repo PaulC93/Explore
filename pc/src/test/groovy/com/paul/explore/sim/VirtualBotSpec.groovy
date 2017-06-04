@@ -1,12 +1,14 @@
 package com.paul.explore.sim
 
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import java.awt.geom.Point2D
 
 import static com.paul.explore.model.GeometryHelper.round
 
-class VirtualBotTest extends Specification {
+@Unroll
+class VirtualBotSpec extends Specification {
 
     def 'should init motor positions'() {
 
@@ -66,38 +68,26 @@ class VirtualBotTest extends Specification {
     }
 
     def 'should scan'() {
-
         given:
         def map = new VirtualMap()
-        //MAP.createObstacles()
-        VirtualBot virtualBot = new VirtualBot(12, 12, o, map)
+        VirtualBot virtualBot = new VirtualBot(70, 100, o, map)
         //VirtualMapView mapView = new VirtualMapView(virtualBot)
 
         when:
         def actualDistances = virtualBot.scan()
-        //Thread.sleep(2000)
+        map.markObservedArea(virtualBot.getRotatingSensor(), actualDistances)
+        // mapView.repaint()
+        //Thread.sleep(5000)
 
         then:
         actualDistances == expectedDistances as int[]
 
         where:
         o    | expectedDistances
-        0    | [55, 55, 55, 44, 22, 15, 12, 11, 11, 16, 17, 21, 29, 55, 55, 55]
-        22.5 | [55, 55, 55, 55, 36, 17, 11, 9, 10, 13, 23, 22, 24, 31, 54, 55]
-        /*   45    | [3, 4]
-           67.5  | [4, 5]
-           90    | [5]
-           112.5 | [6]
-           135   | [7]
-           157.5 | [8]
-           180   | [9]
-           202.5 | [10]
-           225   | [11]
-           247.5 | [12]
-           270   | [13]
-           292.5 | [14]
-           315   | [15]
-           337.5 | [16]
-           360   | [17]*/
+        0    | [7, 4, 4, 4, 7, 17, 55, 55, 55, 55, 41, 55, 55, 55, 55, 55]
+        22.5 | [55, 7, 4, 4, 4, 7, 17, 55, 55, 55, 55, 41, 55, 55, 55, 55]
+        45   | [55, 55, 55, 5, 4, 5, 8, 20, 55, 55, 55, 43, 39, 55, 55, 55]
+        67.5 | [55, 55, 55, 55, 8, 7, 8, 11, 25, 55, 55, 55, 41, 38, 55, 55]
+        90   | [55, 55, 55, 55, 55, 10, 9, 10, 14, 31, 55, 55, 55, 39, 36, 55]
     }
 }
